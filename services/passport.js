@@ -16,45 +16,44 @@ passport.use(new GoogleStrategy({
         proxy: true
     },
     //this is promises below which looks weird refactored similar to .then
-    (accessToken, refresh, profile, done) => {
-        User.findOne({
-            google: {
-                id: profile.id
-                }
-            })
-            .then((existingUser) => {
-                if (existingUser) {
-                    // we already have a record with the given profile ID
-                    console.log('existingUser or user:', existingUser);
-                    return done(null, existingUser);
-                } else {
-                    // we don't have a user record with a user ID
-                    new User({
-                        google: {
-                            id: profile.id
-                        }
-                    })
-                        .save()
-                        .then(user => done(null, user));
-                }
-            });
-    })
-    // async (accessToken, refresh, profile, done) => {
-    //     const existingUser = await User.findOne({ google: {
-    //         id: profile.id
-    //     }
-    //     });
-    //
-    //     if(existingUser) {
-    //         // we already ahve a record with the given profiel ID
-    //         console.log('existingUser or user:', existingUser);
-    //         return done(null, existingUser);
-    //     }
-    //     // we don't have a user record with a user ID
-    //     const user = await new User({ google: {id: profile.id}}).save(); // passes this back to passport
-    //     done(null, user);
-    //
+    // (accessToken, refresh, profile, done) => {
+    //     User.findOne({
+    //         google: {
+    //             id: profile.id
+    //             }
+    //         })
+    //         .then((existingUser) => {
+    //             if (existingUser) {
+    //                 // we already have a record with the given profile ID
+    //                 console.log('existingUser or user:', existingUser);
+    //                 return done(null, existingUser);
+    //             } else {
+    //                 // we don't have a user record with a user ID
+    //                 new User({
+    //                     google: {
+    //                         id: profile.id
+    //                     }
+    //                 })
+    //                     .save()
+    //                     .then(user => done(null, user));
+    //             }
+    //         });
     // })
+    async (accessToken, refresh, profile, done) => {
+        const existingUser = await User.findOne({ google: {
+            id: profile.id
+        }
+        });
+
+        if(existingUser) {
+            // we already ahve a record with the given profiel ID
+            console.log('existingUser or user:', existingUser);
+            return done(null, existingUser);
+        }
+        // we don't have a user record with a user ID
+        const user = await new User({ google: {id: profile.id}}).save(); // passes this back to passport
+        done(null, user);
+    })
 );
 
 
